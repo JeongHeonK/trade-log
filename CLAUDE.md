@@ -103,6 +103,7 @@ hooks/                            # 커스텀 훅
 - 백엔드 서버, 서버 사이드 DB, 외부 인증 서비스 도입 금지
 - barrel file(index.ts로 re-export) 사용 금지. 직접 경로 import
 - shared/ui/ 아래 shadcn 생성 파일 직접 수정 지양
+- 커밋 메시지, PR 본문에 AI attribution 금지 ("Generated with Claude Code", "Co-Authored-By: Claude" 등)
 
 ### Next.js / React
 - layout.tsx는 서버 컴포넌트 유지. 클라이언트 로직은 providers.tsx에 격리
