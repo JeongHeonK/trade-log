@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Noto_Sans } from "next/font/google";
+import { AppSidebar } from "@/features/layout/app-sidebar";
 import { Providers } from "./providers";
 import "./globals.css";
 
@@ -23,7 +24,9 @@ export default function RootLayout({
   return (
     <html lang="ko" className={notoSans.variable}>
       <body className={`${geistMono.variable} antialiased`}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <AppSidebar>{children}</AppSidebar>
+        </Providers>
       </body>
     </html>
   );

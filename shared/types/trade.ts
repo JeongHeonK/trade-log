@@ -2,7 +2,7 @@ export type TradeDirection = "long" | "short";
 export type TradeStatus = "open" | "closed";
 
 export interface Trade {
-  id?: number;
+  id: string;
   ticker: string;
   direction: TradeDirection;
   status: TradeStatus;
@@ -16,7 +16,6 @@ export interface Trade {
   tags: string[];
   reasoning: string;
   reflection?: string;
-  screenshots?: Blob[];
   createdAt: string;
   updatedAt: string;
 }

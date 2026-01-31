@@ -48,24 +48,48 @@
 
 ```
 app/                              # Next.js App Router (라우팅)
-  layout.tsx                      # 서버 컴포넌트, Providers 감싸기만
-  providers.tsx                   # 클라이언트 전용, YjsProvider dynamic import
-  trades/                         # 매매 기록 관련 페이지
-  dashboard/                      # 통계/대시보드
+  layout.tsx                      # 서버 컴포넌트, Providers + AppSidebar 감싸기
+  providers.tsx                   # 클라이언트 전용, ClientProviders dynamic import
+  page.tsx                        # 대시보드 (/)
+  trades/
+    page.tsx                      # 매매 목록 (/trades)
+    new/page.tsx                  # 매매 등록 (/trades/new)
+    [id]/page.tsx                 # 매매 상세 (/trades/[id])
+    [id]/edit/page.tsx            # 매매 수정 (/trades/[id]/edit)
 shared/                           # 공통 레이어
   ui/                             # shadcn 생성 컴포넌트 (직접 수정 지양)
   lib/
     utils.ts                      # cn() 등 유틸
   types/
     trade.ts                      # Trade 타입 정의
+    trade-filters.ts              # TradeFilters 타입
   infrastructure/                 # 로컬 퍼스트 데이터 레이어
     yjs/doc.ts                    # Y.Doc 싱글턴 + y-indexeddb persistence
     yjs/provider.tsx              # YjsContext + useYjs 훅
+    yjs/trades.ts                 # Yjs trades shared type (CRUD)
     db/schema.ts                  # Dexie IndexedDB 스키마
+    sync/trades-sync.ts           # Yjs → Dexie 단방향 동기화
+    sync/sync-provider.tsx        # SyncProvider (동기화 시작/정리)
+    client-providers.tsx          # YjsProvider + SyncProvider 조합
 features/                         # 비즈니스 피처 레이어
-  trades/                         # 매매일지 피처
-  dashboard/                      # 대시보드 피처
+  layout/
+    app-sidebar.tsx               # 사이드바 네비게이션 (데스크탑 + 모바일)
+  trades/
+    api/trade-repository.ts       # Dexie 기반 조회 (필터, 단건, 최근)
+    lib/calc-pnl.ts               # PnL 계산 순수 함수
+    ui/trade-card.tsx             # 매매 카드 컴포넌트
+    ui/trade-form.tsx             # 매매 폼 (React Hook Form)
+    ui/trade-form-page.tsx        # 폼 페이지 (등록/수정 모드)
+    ui/trade-detail-page.tsx      # 매매 상세 페이지
+    ui/trades-filter-bar.tsx      # 필터 바 (상태/방향)
+    ui/trades-list-page.tsx       # 매매 목록 페이지
+  dashboard/
+    lib/calc-stats.ts             # 대시보드 통계 계산
+    ui/stat-card.tsx              # 통계 카드 컴포넌트
+    ui/dashboard-page.tsx         # 대시보드 페이지
 hooks/                            # 커스텀 훅
+  use-trades.ts                   # Dexie live query 기반 매매 목록 구독
+  use-trade-mutations.ts          # Yjs 기반 매매 CRUD 훅
 ```
 
 ## 코딩 컨벤션
@@ -79,6 +103,7 @@ hooks/                            # 커스텀 훅
 - 백엔드 서버, 서버 사이드 DB, 외부 인증 서비스 도입 금지
 - barrel file(index.ts로 re-export) 사용 금지. 직접 경로 import
 - shared/ui/ 아래 shadcn 생성 파일 직접 수정 지양
+- 커밋 메시지, PR 본문에 AI attribution 금지 ("Generated with Claude Code", "Co-Authored-By: Claude" 등)
 
 ### Next.js / React
 - layout.tsx는 서버 컴포넌트 유지. 클라이언트 로직은 providers.tsx에 격리
