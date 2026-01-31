@@ -3,12 +3,14 @@
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 
-const YjsProvider = dynamic(
+const ClientProviders = dynamic(
   () =>
-    import("@/shared/infrastructure/yjs/provider").then((m) => m.YjsProvider),
+    import("@/shared/infrastructure/client-providers").then(
+      (m) => m.ClientProviders,
+    ),
   { ssr: false },
 );
 
 export function Providers({ children }: { children: ReactNode }) {
-  return <YjsProvider>{children}</YjsProvider>;
+  return <ClientProviders>{children}</ClientProviders>;
 }
