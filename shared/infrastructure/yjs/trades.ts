@@ -20,12 +20,13 @@ export function updateTrade(
   partial: Partial<Omit<Trade, "id">>,
 ): void {
   const trades = getTradesMap();
-  const existing = trades.get(id);
-  if (!existing) return;
+  if (!trades.has(id)) return;
   const doc = getYDoc();
   doc.transact(() => {
+    const latest = trades.get(id);
+    if (!latest) return;
     trades.set(id, {
-      ...existing,
+      ...latest,
       ...partial,
       updatedAt: new Date().toISOString(),
     });
