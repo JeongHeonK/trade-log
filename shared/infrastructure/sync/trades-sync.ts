@@ -10,9 +10,17 @@ function getTradesMap() {
   return doc.getMap<Trade>("trades");
 }
 
-async function bulkSyncToDb(trades: Trade[]): Promise<void> {
+async function initialSyncToDb(trades: Trade[]): Promise<void> {
   await db.transaction("rw", db.trades, async () => {
-    await db.trades.clear();
+    const existingIds = new Set(
+      (await db.trades.toCollection().primaryKeys()) as string[],
+    );
+    const yjsIds = new Set(trades.map((t) => t.id));
+
+    const toDelete = [...existingIds].filter((id) => !yjsIds.has(id));
+    if (toDelete.length > 0) {
+      await db.trades.bulkDelete(toDelete);
+    }
     if (trades.length > 0) {
       await db.trades.bulkPut(trades);
     }
@@ -56,21 +64,24 @@ async function handleYjsEvent(
 
 export function startTradesSync(onStatus: SyncCallback): () => void {
   const trades = getTradesMap();
+  let observer: ((event: YMapEvent<Trade>) => void) | null = null;
 
   onStatus("syncing");
 
   const initialData = Array.from(trades.values());
-  bulkSyncToDb(initialData)
-    .then(() => onStatus("synced"))
+  initialSyncToDb(initialData)
+    .then(() => {
+      onStatus("synced");
+      observer = (event: YMapEvent<Trade>) => {
+        handleYjsEvent(event, onStatus);
+      };
+      trades.observe(observer);
+    })
     .catch(() => onStatus("error"));
 
-  const observer = (event: YMapEvent<Trade>) => {
-    handleYjsEvent(event, onStatus);
-  };
-
-  trades.observe(observer);
-
   return () => {
-    trades.unobserve(observer);
+    if (observer) {
+      trades.unobserve(observer);
+    }
   };
 }
