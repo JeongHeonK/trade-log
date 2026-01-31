@@ -6,7 +6,7 @@ const db = new Dexie("trade-log") as Dexie & {
 };
 
 db.version(1).stores({
-  trades: "++id, ticker, direction, status, entryDate, exitDate, *tags",
+  trades: "id, ticker, direction, status, entryDate, exitDate, *tags",
 });
 
 export { db };
