@@ -23,5 +23,35 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: "any",
       },
     ],
+    screenshots: [
+      {
+        src: "/screenshots/desktop-1.png",
+        sizes: "1280x720",
+        type: "image/png",
+        form_factor: "wide",
+        label: "대시보드",
+      },
+      {
+        src: "/screenshots/desktop-2.png",
+        sizes: "1280x720",
+        type: "image/png",
+        form_factor: "wide",
+        label: "매매 목록",
+      },
+      {
+        src: "/screenshots/mobile-1.png",
+        sizes: "390x844",
+        type: "image/png",
+        form_factor: "narrow",
+        label: "대시보드",
+      },
+      {
+        src: "/screenshots/mobile-2.png",
+        sizes: "390x844",
+        type: "image/png",
+        form_factor: "narrow",
+        label: "매매 목록",
+      },
+    ],
   };
 }
