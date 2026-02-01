@@ -37,5 +37,5 @@ export function formatPnl(value: number): string {
 /** 통화 금액을 부호 + 천단위 구분 형식으로 변환 (0 이상이면 + 표시) */
 export function formatCurrency(value: number): string {
   const sign = value >= 0 ? "+" : "";
-  return `${sign}${value.toLocaleString("ko-KR")}`;
+  return `${sign}${formatNumber(value)}`;
 }
