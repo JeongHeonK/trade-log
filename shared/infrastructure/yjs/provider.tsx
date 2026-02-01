@@ -24,7 +24,10 @@ export function YjsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const persistence = getYPersistence();
-    if (!persistence) return;
+    if (!persistence) {
+      setSynced(true);
+      return;
+    }
 
     if (persistence.synced) {
       setSynced(true);
