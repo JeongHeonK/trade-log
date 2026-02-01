@@ -6,8 +6,9 @@ import { useLiveQuery } from "dexie-react-hooks";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
+import { toast } from "sonner";
 import { getTradeById } from "@/features/trades/api/trade-repository";
-import { useDeleteTrade } from "@/hooks/use-trade-mutations";
+import { useDeleteTrade } from "@/features/trades/hooks/use-trade-mutations";
 import {
   formatDate,
   formatNumber,
@@ -57,8 +58,13 @@ export function TradeDetailPage({ id }: TradeDetailPageProps) {
   const trade = useLiveQuery(() => getTradeById(id), [id]);
 
   const handleDelete = useCallback(() => {
-    deleteTrade(id);
-    router.push("/trades");
+    try {
+      deleteTrade(id);
+      toast.success("매매가 삭제되었습니다");
+      router.push("/trades");
+    } catch {
+      toast.error("오류가 발생했습니다");
+    }
   }, [id, deleteTrade, router]);
 
   if (trade === undefined) {

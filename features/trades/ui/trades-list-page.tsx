@@ -4,9 +4,9 @@ import { Add01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useTrades } from "@/features/trades/hooks/use-trades";
 import { TradeCard } from "@/features/trades/ui/trade-card";
 import { TradesFilterBar } from "@/features/trades/ui/trades-filter-bar";
-import { useTrades } from "@/hooks/use-trades";
 import type { TradeFilters } from "@/shared/types/trade-filters";
 import { Button } from "@/shared/ui/button";
 

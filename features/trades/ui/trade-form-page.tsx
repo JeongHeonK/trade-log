@@ -3,9 +3,13 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
+import { toast } from "sonner";
 import { getTradeById } from "@/features/trades/api/trade-repository";
+import {
+  useAddTrade,
+  useUpdateTrade,
+} from "@/features/trades/hooks/use-trade-mutations";
 import { TradeForm, type TradeFormData } from "@/features/trades/ui/trade-form";
-import { useAddTrade, useUpdateTrade } from "@/hooks/use-trade-mutations";
 
 interface TradeFormPageProps {
   id?: string;
@@ -19,17 +23,27 @@ export function TradeFormPage({ id }: TradeFormPageProps) {
 
   const trade = useLiveQuery(() => (id ? getTradeById(id) : undefined), [id]);
 
+  const handleCancel = useCallback(() => {
+    router.back();
+  }, [router]);
+
   const handleSubmit = useCallback(
     (data: TradeFormData) => {
-      if (isEdit && id) {
-        updateTrade(id, {
-          ...data,
-          updatedAt: new Date().toISOString(),
-        });
-        router.push(`/trades/${id}`);
-      } else {
-        addTrade(data);
-        router.push("/trades");
+      try {
+        if (isEdit && id) {
+          updateTrade(id, {
+            ...data,
+            updatedAt: new Date().toISOString(),
+          });
+          toast.success("매매가 수정되었습니다");
+          router.push(`/trades/${id}`);
+        } else {
+          addTrade(data);
+          toast.success("매매가 등록되었습니다");
+          router.push("/trades");
+        }
+      } catch {
+        toast.error("오류가 발생했습니다");
       }
     },
     [isEdit, id, addTrade, updateTrade, router],
@@ -80,6 +94,7 @@ export function TradeFormPage({ id }: TradeFormPageProps) {
         mode={isEdit ? "edit" : "create"}
         defaultValues={defaultValues}
         onSubmit={handleSubmit}
+        onCancel={handleCancel}
       />
     </div>
   );
