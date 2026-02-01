@@ -6,8 +6,15 @@ import { useLiveQuery } from "dexie-react-hooks";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
+import { toast } from "sonner";
 import { getTradeById } from "@/features/trades/api/trade-repository";
-import { useDeleteTrade } from "@/hooks/use-trade-mutations";
+import { useDeleteTrade } from "@/features/trades/hooks/use-trade-mutations";
+import {
+  formatDate,
+  formatNumber,
+  formatPercent,
+  formatPnl,
+} from "@/shared/lib/format";
 import { cn } from "@/shared/lib/utils";
 import {
   AlertDialog,
@@ -27,32 +34,6 @@ import { Separator } from "@/shared/ui/separator";
 
 interface TradeDetailPageProps {
   id: string;
-}
-
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-}
-
-function formatNumber(value: number): string {
-  return value.toLocaleString("ko-KR", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  });
-}
-
-function formatPercent(value: number): string {
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${value.toFixed(2)}%`;
-}
-
-function formatPnl(value: number): string {
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${formatNumber(value)}`;
 }
 
 function InfoRow({
@@ -77,8 +58,13 @@ export function TradeDetailPage({ id }: TradeDetailPageProps) {
   const trade = useLiveQuery(() => getTradeById(id), [id]);
 
   const handleDelete = useCallback(() => {
-    deleteTrade(id);
-    router.push("/trades");
+    try {
+      deleteTrade(id);
+      toast.success("매매가 삭제되었습니다");
+      router.push("/trades");
+    } catch {
+      toast.error("오류가 발생했습니다");
+    }
   }, [id, deleteTrade, router]);
 
   if (trade === undefined) {

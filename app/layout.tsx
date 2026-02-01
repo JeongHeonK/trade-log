@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Noto_Sans } from "next/font/google";
 import { AppSidebar } from "@/features/layout/app-sidebar";
+import { Toaster } from "@/shared/ui/sonner";
 import { Providers } from "./providers";
 import "./globals.css";
 
@@ -26,6 +27,7 @@ export default function RootLayout({
       <body className={`${geistMono.variable} antialiased`}>
         <Providers>
           <AppSidebar>{children}</AppSidebar>
+          <Toaster richColors position="bottom-right" />
         </Providers>
       </body>
     </html>

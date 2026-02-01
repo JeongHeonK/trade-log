@@ -5,6 +5,7 @@ import {
   type ReactNode,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import type * as Y from "yjs";
@@ -23,7 +24,10 @@ export function YjsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const persistence = getYPersistence();
-    if (!persistence) return;
+    if (!persistence) {
+      setSynced(true);
+      return;
+    }
 
     if (persistence.synced) {
       setSynced(true);
@@ -37,11 +41,12 @@ export function YjsProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  return (
-    <YjsContext.Provider value={{ doc, synced }}>
-      {children}
-    </YjsContext.Provider>
+  const value = useMemo<YjsContextValue>(
+    () => ({ doc, synced }),
+    [doc, synced],
   );
+
+  return <YjsContext.Provider value={value}>{children}</YjsContext.Provider>;
 }
 
 export function useYjs(): YjsContextValue {

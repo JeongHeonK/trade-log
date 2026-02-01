@@ -8,37 +8,52 @@ function getTradesMap(): Y.Map<Trade> {
 }
 
 export function addTrade(trade: Trade): void {
-  const trades = getTradesMap();
-  const doc = getYDoc();
-  doc.transact(() => {
-    trades.set(trade.id, trade);
-  });
+  try {
+    const trades = getTradesMap();
+    const doc = getYDoc();
+    doc.transact(() => {
+      trades.set(trade.id, trade);
+    });
+  } catch (err) {
+    console.error("[trade-log] addTrade failed:", err);
+    throw err;
+  }
 }
 
 export function updateTrade(
   id: string,
   partial: Partial<Omit<Trade, "id">>,
 ): void {
-  const trades = getTradesMap();
-  if (!trades.has(id)) return;
-  const doc = getYDoc();
-  doc.transact(() => {
-    const latest = trades.get(id);
-    if (!latest) return;
-    trades.set(id, {
-      ...latest,
-      ...partial,
-      updatedAt: new Date().toISOString(),
+  try {
+    const trades = getTradesMap();
+    if (!trades.has(id)) return;
+    const doc = getYDoc();
+    doc.transact(() => {
+      const latest = trades.get(id);
+      if (!latest) return;
+      trades.set(id, {
+        ...latest,
+        ...partial,
+        updatedAt: new Date().toISOString(),
+      });
     });
-  });
+  } catch (err) {
+    console.error(`[trade-log] updateTrade failed (id=${id}):`, err);
+    throw err;
+  }
 }
 
 export function deleteTrade(id: string): void {
-  const trades = getTradesMap();
-  const doc = getYDoc();
-  doc.transact(() => {
-    trades.delete(id);
-  });
+  try {
+    const trades = getTradesMap();
+    const doc = getYDoc();
+    doc.transact(() => {
+      trades.delete(id);
+    });
+  } catch (err) {
+    console.error(`[trade-log] deleteTrade failed (id=${id}):`, err);
+    throw err;
+  }
 }
 
 export function getTrade(id: string): Trade | undefined {
