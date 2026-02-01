@@ -16,18 +16,16 @@ export function SeedProvider({ children }: { children: ReactNode }) {
     if (localStorage.getItem(SEED_KEY)) return;
 
     const existing = getAllTrades();
-    if (existing.length > 0) {
-      localStorage.setItem(SEED_KEY, "1");
-      return;
+    if (existing.length === 0) {
+      const doc = getYDoc();
+      doc.transact(() => {
+        for (const trade of SEED_TRADES) {
+          addTrade(trade);
+        }
+      });
     }
 
     localStorage.setItem(SEED_KEY, "1");
-    const doc = getYDoc();
-    doc.transact(() => {
-      for (const trade of SEED_TRADES) {
-        addTrade(trade);
-      }
-    });
   }, [synced]);
 
   return <>{children}</>;
