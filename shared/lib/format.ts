@@ -24,7 +24,7 @@ export function formatNumber(value: number): string {
 
 /** 퍼센트 값을 부호 포함 문자열로 변환 (예: "+12.34%", "-5.00%") */
 export function formatPercent(value: number): string {
-  const sign = value > 0 ? "+" : "";
+  const sign = value >= 0 ? "+" : "";
   return `${sign}${value.toFixed(2)}%`;
 }
 
