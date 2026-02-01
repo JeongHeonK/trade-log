@@ -11,6 +11,14 @@ const ClientProviders = dynamic(
   { ssr: false },
 );
 
+const SWProvider = dynamic(
+  () =>
+    import("@/shared/infrastructure/pwa/sw-lifecycle").then(
+      (m) => m.SWProvider,
+    ),
+  { ssr: false },
+);
+
 const UpdatePrompt = dynamic(
   () => import("@/features/pwa/ui/update-prompt").then((m) => m.UpdatePrompt),
   { ssr: false },
@@ -24,9 +32,11 @@ const InstallPrompt = dynamic(
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <ClientProviders>
-      {children}
-      <UpdatePrompt />
-      <InstallPrompt />
+      <SWProvider>
+        {children}
+        <UpdatePrompt />
+        <InstallPrompt />
+      </SWProvider>
     </ClientProviders>
   );
 }
