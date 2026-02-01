@@ -1,6 +1,7 @@
 "use client";
 
 import { type ReactNode, useEffect } from "react";
+import { getYDoc } from "@/shared/infrastructure/yjs/doc";
 import { useYjs } from "@/shared/infrastructure/yjs/provider";
 import { addTrade, getAllTrades } from "@/shared/infrastructure/yjs/trades";
 import { SEED_TRADES } from "./trades-seed";
@@ -20,10 +21,13 @@ export function SeedProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    for (const trade of SEED_TRADES) {
-      addTrade(trade);
-    }
     localStorage.setItem(SEED_KEY, "1");
+    const doc = getYDoc();
+    doc.transact(() => {
+      for (const trade of SEED_TRADES) {
+        addTrade(trade);
+      }
+    });
   }, [synced]);
 
   return <>{children}</>;
