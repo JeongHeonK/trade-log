@@ -57,7 +57,8 @@ async function handleYjsEvent(
     });
 
     onStatus("synced");
-  } catch {
+  } catch (err) {
+    console.error("[trade-log] Yjs → Dexie sync failed:", err);
     onStatus("error");
   }
 }
@@ -65,21 +66,28 @@ async function handleYjsEvent(
 export function startTradesSync(onStatus: SyncCallback): () => void {
   const trades = getTradesMap();
   let observer: ((event: YMapEvent<Trade>) => void) | null = null;
+  let aborted = false;
 
   onStatus("syncing");
 
   const initialData = Array.from(trades.values());
   initialSyncToDb(initialData)
     .then(() => {
+      if (aborted) return;
       onStatus("synced");
       observer = (event: YMapEvent<Trade>) => {
         handleYjsEvent(event, onStatus);
       };
       trades.observe(observer);
     })
-    .catch(() => onStatus("error"));
+    .catch((err) => {
+      console.error("[trade-log] Initial sync to Dexie failed:", err);
+      if (aborted) return;
+      onStatus("error");
+    });
 
   return () => {
+    aborted = true;
     if (observer) {
       trades.unobserve(observer);
     }
