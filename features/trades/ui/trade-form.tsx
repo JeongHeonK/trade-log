@@ -52,6 +52,7 @@ interface TradeFormProps {
   mode: "create" | "edit";
   defaultValues?: TradeFormData;
   onSubmit: (data: TradeFormData) => void;
+  onCancel?: () => void;
 }
 
 function toFormValues(data?: TradeFormData): TradeFormValues {
@@ -136,7 +137,12 @@ function PnlPreview({
   );
 }
 
-export function TradeForm({ mode, defaultValues, onSubmit }: TradeFormProps) {
+export function TradeForm({
+  mode,
+  defaultValues,
+  onSubmit,
+  onCancel,
+}: TradeFormProps) {
   const {
     register,
     handleSubmit,
@@ -262,6 +268,7 @@ export function TradeForm({ mode, defaultValues, onSubmit }: TradeFormProps) {
             id="entryPrice"
             type="number"
             step="any"
+            min="0"
             placeholder="0"
             aria-invalid={!!errors.entryPrice}
             aria-describedby={
@@ -281,15 +288,31 @@ export function TradeForm({ mode, defaultValues, onSubmit }: TradeFormProps) {
         </Field>
 
         {isClosed && (
-          <Field>
+          <Field data-invalid={!!errors.exitPrice || undefined}>
             <FieldLabel htmlFor="exitPrice">청산가</FieldLabel>
             <Input
               id="exitPrice"
               type="number"
               step="any"
+              min="0"
               placeholder="0"
-              {...register("exitPrice")}
+              aria-invalid={!!errors.exitPrice}
+              aria-describedby={
+                errors.exitPrice ? "exitPrice-error" : undefined
+              }
+              {...register("exitPrice", {
+                validate: (v) => {
+                  if (watchedStatus !== "closed") return true;
+                  if (!v || v.trim() === "") return "청산가를 입력하세요";
+                  return true;
+                },
+              })}
             />
+            {errors.exitPrice && (
+              <FieldError id="exitPrice-error">
+                {errors.exitPrice.message}
+              </FieldError>
+            )}
           </Field>
         )}
 
@@ -299,6 +322,7 @@ export function TradeForm({ mode, defaultValues, onSubmit }: TradeFormProps) {
             id="quantity"
             type="number"
             step="any"
+            min="0"
             placeholder="0"
             aria-invalid={!!errors.quantity}
             aria-describedby={errors.quantity ? "quantity-error" : undefined}
@@ -334,9 +358,28 @@ export function TradeForm({ mode, defaultValues, onSubmit }: TradeFormProps) {
         </Field>
 
         {isClosed && (
-          <Field>
+          <Field data-invalid={!!errors.exitDate || undefined}>
             <FieldLabel htmlFor="exitDate">청산일</FieldLabel>
-            <Input id="exitDate" type="date" {...register("exitDate")} />
+            <Input
+              id="exitDate"
+              type="date"
+              aria-invalid={!!errors.exitDate}
+              aria-describedby={errors.exitDate ? "exitDate-error" : undefined}
+              {...register("exitDate", {
+                validate: (v, formValues) => {
+                  if (!v || !formValues.entryDate) return true;
+                  return (
+                    v >= formValues.entryDate ||
+                    "청산일은 진입일 이후여야 합니다"
+                  );
+                },
+              })}
+            />
+            {errors.exitDate && (
+              <FieldError id="exitDate-error">
+                {errors.exitDate.message}
+              </FieldError>
+            )}
           </Field>
         )}
       </div>
@@ -390,6 +433,11 @@ export function TradeForm({ mode, defaultValues, onSubmit }: TradeFormProps) {
       </Field>
 
       <div className="flex justify-end gap-3">
+        {onCancel && (
+          <Button type="button" variant="outline" onClick={onCancel}>
+            취소
+          </Button>
+        )}
         <Button type="submit" disabled={isSubmitting} aria-busy={isSubmitting}>
           {isSubmitting
             ? "저장 중..."
