@@ -1,6 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import {
+  formatDate,
+  formatNumber,
+  formatPercent,
+  formatPnl,
+} from "@/shared/lib/format";
 import { cn } from "@/shared/lib/utils";
 import type { Trade } from "@/shared/types/trade";
 import { Badge } from "@/shared/ui/badge";
@@ -8,32 +14,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 
 interface TradeCardProps {
   trade: Trade;
-}
-
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-}
-
-function formatNumber(value: number): string {
-  return value.toLocaleString("ko-KR", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  });
-}
-
-function formatPercent(value: number): string {
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${value.toFixed(2)}%`;
-}
-
-function formatPnl(value: number): string {
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${formatNumber(value)}`;
 }
 
 function PnlDisplay({

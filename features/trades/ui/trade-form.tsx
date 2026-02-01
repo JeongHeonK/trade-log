@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { calcPnl, calcPnlPercent } from "@/features/trades/lib/calc-pnl";
+import { formatPercent, formatPnl } from "@/shared/lib/format";
 import { cn } from "@/shared/lib/utils";
 import type { TradeDirection, TradeStatus } from "@/shared/types/trade";
 import { Button } from "@/shared/ui/button";
@@ -51,23 +52,6 @@ interface TradeFormProps {
   mode: "create" | "edit";
   defaultValues?: TradeFormData;
   onSubmit: (data: TradeFormData) => void;
-}
-
-function formatNumber(value: number): string {
-  return value.toLocaleString("ko-KR", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  });
-}
-
-function formatPercent(value: number): string {
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${value.toFixed(2)}%`;
-}
-
-function formatPnl(value: number): string {
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${formatNumber(value)}`;
 }
 
 function toFormValues(data?: TradeFormData): TradeFormValues {

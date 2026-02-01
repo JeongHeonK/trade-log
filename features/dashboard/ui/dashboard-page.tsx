@@ -3,17 +3,8 @@
 import { calcStats } from "@/features/dashboard/lib/calc-stats";
 import { StatCard } from "@/features/dashboard/ui/stat-card";
 import { useTrades } from "@/hooks/use-trades";
+import { formatCurrency, formatPercent } from "@/shared/lib/format";
 import { cn } from "@/shared/lib/utils";
-
-function formatCurrency(value: number): string {
-  const sign = value >= 0 ? "+" : "";
-  return `${sign}${value.toLocaleString("ko-KR")}`;
-}
-
-function formatPercent(value: number): string {
-  const sign = value >= 0 ? "+" : "";
-  return `${sign}${value.toFixed(2)}%`;
-}
 
 export function DashboardPage() {
   const trades = useTrades();
