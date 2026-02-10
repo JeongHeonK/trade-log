@@ -53,9 +53,7 @@ export async function getTradesByFilter(
       (t) =>
         (!startDate || t.entryDate >= startDate) &&
         (!endDate || t.entryDate <= endDate) &&
-        (!tags ||
-          tags.length === 0 ||
-          tags.every((tag) => t.tags.includes(tag))),
+        (!tags || tags.every((tag) => t.tags.includes(tag))),
     );
   }
 
