@@ -1,6 +1,6 @@
 "use client";
 
-import type { TradeDirection, TradeStatus } from "@/shared/types/trade";
+import { isTradeDirection, isTradeStatus } from "@/shared/types/trade";
 import type { TradeFilters } from "@/shared/types/trade-filters";
 import {
   Select,
@@ -23,7 +23,11 @@ export function TradesFilterBar({
     onFiltersChange({
       ...filters,
       status:
-        value === "all" || value === null ? undefined : (value as TradeStatus),
+        !value || value === "all"
+          ? undefined
+          : isTradeStatus(value)
+            ? value
+            : undefined,
     });
   };
 
@@ -31,9 +35,11 @@ export function TradesFilterBar({
     onFiltersChange({
       ...filters,
       direction:
-        value === "all" || value === null
+        !value || value === "all"
           ? undefined
-          : (value as TradeDirection),
+          : isTradeDirection(value)
+            ? value
+            : undefined,
     });
   };
 

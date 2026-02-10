@@ -55,16 +55,19 @@ export function TradeDetailPage({ id }: TradeDetailPageProps) {
   const router = useRouter();
   const deleteTrade = useDeleteTrade();
 
-  const trade = useLiveQuery(() => getTradeById(id), [id]);
+  const trade = useLiveQuery(
+    () => getTradeById(id).then((t) => t ?? null),
+    [id],
+  );
 
   const handleDelete = useCallback(() => {
-    try {
-      deleteTrade(id);
-      toast.success("매매가 삭제되었습니다");
-      router.push("/trades");
-    } catch {
-      toast.error("오류가 발생했습니다");
+    const result = deleteTrade(id);
+    if (!result.success) {
+      toast.error(`매매 삭제 실패: ${result.error}`);
+      return;
     }
+    toast.success("매매가 삭제되었습니다");
+    router.push("/trades");
   }, [id, deleteTrade, router]);
 
   if (trade === undefined) {
@@ -75,7 +78,7 @@ export function TradeDetailPage({ id }: TradeDetailPageProps) {
     );
   }
 
-  if (!trade) {
+  if (trade === null) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
         <p className="text-muted-foreground text-sm">
