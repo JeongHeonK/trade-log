@@ -16,6 +16,10 @@ export function UpdatePrompt() {
         label: "업데이트",
         onClick: applyUpdate,
       },
+      cancel: {
+        label: "나중에",
+        onClick: () => {},
+      },
     });
   }, [hasUpdate, applyUpdate]);
 

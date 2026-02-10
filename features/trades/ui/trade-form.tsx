@@ -107,7 +107,7 @@ function PnlPreview({
     if (Number.isNaN(entry) || Number.isNaN(exit) || Number.isNaN(qty)) {
       return null;
     }
-    if (entry <= 0 || qty <= 0) return null;
+    if (entry <= 0 || exit <= 0 || qty <= 0) return null;
     const pnl = calcPnl(entry, exit, qty, direction);
     const pnlPercent = calcPnlPercent(entry, exit, direction);
     return { pnl, pnlPercent };
@@ -171,7 +171,13 @@ export function TradeForm({
     let pnl: number | undefined;
     let pnlPercent: number | undefined;
 
-    if (isClosed && exit !== undefined && !Number.isNaN(exit) && entry > 0) {
+    if (
+      isClosed &&
+      exit !== undefined &&
+      !Number.isNaN(exit) &&
+      exit > 0 &&
+      entry > 0
+    ) {
       pnl = calcPnl(entry, exit, qty, values.direction);
       pnlPercent = calcPnlPercent(entry, exit, values.direction);
     }
@@ -215,6 +221,14 @@ export function TradeForm({
             aria-describedby={errors.ticker ? "ticker-error" : undefined}
             {...register("ticker", {
               required: "종목코드를 입력하세요",
+              maxLength: {
+                value: 20,
+                message: "종목코드는 20자 이내로 입력하세요",
+              },
+              pattern: {
+                value: /^[A-Za-z0-9.-]+$/,
+                message: "영문, 숫자, '.', '-'만 사용할 수 있습니다",
+              },
             })}
           />
           {errors.ticker && (
@@ -304,6 +318,9 @@ export function TradeForm({
                 validate: (v) => {
                   if (watchedStatus !== "closed") return true;
                   if (!v || v.trim() === "") return "청산가를 입력하세요";
+                  const parsed = Number.parseFloat(v);
+                  if (Number.isNaN(parsed) || parsed <= 0)
+                    return "0보다 큰 값을 입력하세요";
                   return true;
                 },
               })}

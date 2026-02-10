@@ -1,6 +1,17 @@
 export type TradeDirection = "long" | "short";
 export type TradeStatus = "open" | "closed";
 
+const TRADE_STATUSES: readonly TradeStatus[] = ["open", "closed"];
+const TRADE_DIRECTIONS: readonly TradeDirection[] = ["long", "short"];
+
+export function isTradeStatus(v: string): v is TradeStatus {
+  return (TRADE_STATUSES as readonly string[]).includes(v);
+}
+
+export function isTradeDirection(v: string): v is TradeDirection {
+  return (TRADE_DIRECTIONS as readonly string[]).includes(v);
+}
+
 export interface Trade {
   id: string;
   ticker: string;

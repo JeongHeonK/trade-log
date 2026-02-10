@@ -21,7 +21,10 @@ export function TradeFormPage({ id }: TradeFormPageProps) {
   const updateTrade = useUpdateTrade();
   const isEdit = !!id;
 
-  const trade = useLiveQuery(() => (id ? getTradeById(id) : undefined), [id]);
+  const trade = useLiveQuery(
+    () => (id ? getTradeById(id).then((t) => t ?? null) : undefined),
+    [id],
+  );
 
   const handleCancel = useCallback(() => {
     router.back();
@@ -29,21 +32,25 @@ export function TradeFormPage({ id }: TradeFormPageProps) {
 
   const handleSubmit = useCallback(
     (data: TradeFormData) => {
-      try {
-        if (isEdit && id) {
-          updateTrade(id, {
-            ...data,
-            updatedAt: new Date().toISOString(),
-          });
-          toast.success("매매가 수정되었습니다");
-          router.push(`/trades/${id}`);
-        } else {
-          addTrade(data);
-          toast.success("매매가 등록되었습니다");
-          router.push("/trades");
+      if (isEdit && id) {
+        const result = updateTrade(id, {
+          ...data,
+          updatedAt: new Date().toISOString(),
+        });
+        if (!result.success) {
+          toast.error(`매매 수정 실패: ${result.error}`);
+          return;
         }
-      } catch {
-        toast.error("오류가 발생했습니다");
+        toast.success("매매가 수정되었습니다");
+        router.push(`/trades/${id}`);
+      } else {
+        const result = addTrade(data);
+        if (!result.success) {
+          toast.error(`매매 등록 실패: ${result.error}`);
+          return;
+        }
+        toast.success("매매가 등록되었습니다");
+        router.push("/trades");
       }
     },
     [isEdit, id, addTrade, updateTrade, router],
